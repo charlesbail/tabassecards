@@ -1,0 +1,451 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+html{
+	min-height: 100vh;
+	min-height: -webkit-fill-available;
+	margin: 0;
+	background: linear-gradient(197.32deg, #FF74C0 16.22%, #FFC4AA 77.15%);
+	box-sizing: border-box;
+	overflow: hidden;
+}
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Rubik', sans-serif;
+}
+
+@media (hover: hover) {
+	.main-button:hover {
+		opacity:0.5;
+		transition: .35s cubic-bezier(0.25, 1, 0.5, 1);
+	}
+}
+
+a
+{
+	text-decoration: none;
+}
+
+.main-wrapper{
+	height: 100vh; /* Fallback for browsers that do not support Custom Properties */
+	height: calc(var(--vh, 1vh) * 100);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	max-width: 300px;
+	margin: 0 auto;
+}
+
+.set-hide{
+	opacity: 0;
+}
+
+.container{
+	width: 263px;
+	display: block;
+}
+
+#title{
+	display:flex;
+	font-size: 56px;
+	font-family: 'Rubik', sans-serif;
+	font-weight: 900;
+	color:white;
+	text-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+}
+
+#message1,#message2{
+	font-family: Verdana, sans-serif
+	font-size: 3em
+	width: 56px;
+	text-align: center;
+	display:block;
+	font-size: 48px;
+}
+
+#message2{
+
+}
+
+#intro{
+	color: #FFFFFF;
+	font-size:16px;
+	line-height: 22px;
+	text-align: center;
+	margin-top: 24px;
+}
+
+#caption{
+	color: #FFFFFF;
+	font-size:16px;
+	text-align: center;
+	margin-top: 24px;
+	font-weight: 300;
+	font-size: 14px;
+	margin-top: 64px;
+	text-shadow: 0px 1px 6px rgba(157, 60, 114, 0.3);
+}
+
+#caption a{
+	color: white;
+	font-weight: 500;
+	padding: 4px;
+	border-radius: 2px;
+	transition: .2s cubic-bezier(0.4, 0.2, 0.2, 1);
+	letter-spacing: 1%;
+}
+
+#caption a:hover{
+	background-color: rgba(21, 41, 52, 0.8);
+	transition: .2s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.start{
+	width: 75%;
+
+	background: #FFFFFF;
+
+	border-radius: 60px;
+
+	font-size: 18px;
+	font-weight: 900;
+	color: #152934;
+	text-transform: uppercase;
+	text-align: center;
+	line-height: 2.5;
+	font-family: 'Rubik', sans-serif;
+	font-weight: 900;
+	margin-top: 48px;
+
+	cursor: pointer;
+	overflow: hidden;
+	
+	box-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+	transition: .4s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.start:hover{
+	transform : scale(1.1);
+	transition: .4s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.start:hover div{
+	color: #152934;
+	transition: .4s cubic-bezier(0.4, 0.2, 0.2, 1);
+	transform : scale(0.65);
+}
+
+.start div{
+	color: #152934;
+	transition: .4s cubic-bezier(0.4, 0.2, 0.2, 1);
+	transform : scale(1);
+}
+
+#block-title{
+	transform: translateY(-50%) translateZ(60px);
+	top: 50%;
+	position: absolute;
+	left: 0;
+	font-weight: 700;
+	font-size: 1.75rem;
+	line-height: 2rem;
+	width: 100%;
+	padding: 1rem;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: 1px solid transparent;
+	-webkit-perspective: inherit;
+	perspective: inherit;
+	z-index: 2;
+	font-family: 'Rubik', sans-serif;
+}
+
+.display-answer{
+	width: 263px;
+	height: 40px;
+	left: calc(50% - 263px/2);
+	top: 388px;
+	background: rgba(255, 255, 255, 0.2);
+	display: block;
+	border-radius: 40px;
+	text-align: center;
+	line-height: 40px;
+	margin: 24px auto 0 auto;
+	z-index: 2;
+	cursor: pointer;
+	overflow: hidden;
+	transition: .15s cubic-bezier(0.4, 0.2, 0.2, 1);
+	font-family: 'Rubik', sans-serif;
+}
+
+.display-answer:hover{
+	transform : scale(1.1);
+}
+
+.display-answer::after{
+	content: "voir la réponse 🙈";
+	text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.15);
+	color: #FFF;
+	overflow: hidden;
+	display: block;
+}
+
+.button-wrapper{
+	display: flex;
+	flex-flow: row;
+	justify-content: center;
+	align-items: center;
+	user-select: none; -webkit-user-select: none; -ms-user-select: none;
+}
+
+.button-wrapper a:nth-of-type(1){
+	content: url(assets/arrow_left.svg);
+}
+
+.button-wrapper a:nth-of-type(2){
+	content: url(assets/arrow_right.svg);
+}
+
+.main-button {
+	color: white;
+	height: 30px;
+	transition: .35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.button-close{
+	width: 40px !important; 
+	height: 40px;
+	border-radius: 40px;
+	background-color: #152934;
+	transition: .35s cubic-bezier(0.4, 0.2, 0.2, 1);
+	overflow: hidden;
+}
+
+.button-close::after{
+	content: url(assets/icon_x_2.svg);
+	color: #FFF;
+	line-height: 55px;
+	overflow: hidden;
+}
+
+.bottom-infos{
+	width: 87%;
+	margin: 24px 0 0 0;
+}
+
+#progress-counter{
+	display: block;
+	color: white;
+	text-align: center;
+	font-weight: 700;
+	font-size:28px;
+	line-height: 40px;
+	width: 144px;
+	user-select: none; -webkit-user-select: none; -ms-user-select: none;
+}
+
+#allEmojis{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	width: 100%;
+	backface-visibility: hidden;
+	user-select: none; -webkit-user-select: none; -ms-user-select: none;
+}
+
+.emoji-box{
+	padding: 0 8px; 
+	text-align: center;
+	font-size: 52px;
+}
+
+.emoji-wrapper{
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+#block-emoji{
+	width: 100%;
+}
+
+.main{
+	margin: 0 auto;
+	width: 500px;
+	padding: 24px;
+	background-color: grey;
+	display: block;
+	border-bottom-right-radius: 20px;
+	border-bottom-left-radius: 20px;
+	border-top-right-radius: 20px;
+	border-top-left-radius: 20px;
+}
+
+
+#bar{
+	width: 100%;
+	height: 5px;
+	border-radius: 50px;
+	background :rgba(255, 255, 255, 0.2);
+	overflow: hidden;
+	margin-top: 16px;
+}
+
+#progressBar{
+	height: 5px;
+	background: #FFFFFF;
+	border-radius: 50px;
+	transition: 300ms;
+	width: 0px;
+}
+
+.cardcont{
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+	-webkit-perspective: 1000px;
+	perspective: 1000px;
+}
+
+.card-style{
+	width: 100%;
+	height: 100%;
+	box-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+	position: relative;
+}
+
+.front,
+.back{
+	background-size: cover;
+	background-position: center;
+	-webkit-transition: -webkit-transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition: -webkit-transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+	-o-transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), -webkit-transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	text-align: center;
+	min-height: 320px;
+	height: auto;
+	color: #fff;
+	font-size: 1.5rem;
+	border-radius: 16px;
+	box-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+	-webkit-transform: rotateY(0deg);
+	transform: rotateY(0deg);
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+}
+
+
+.front:after{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	content: '';
+	display: block;
+	opacity: 1;
+	background: linear-gradient(139.3deg, #FFFFFF 11.77%, #FAE7ED 86.2%);
+	border-radius: 16px;
+}
+
+
+.back{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background: #152934;
+	-webkit-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+}
+
+.inner{
+	transform: translateY(-50%) translateZ(56px) ;
+	top: 50%;
+	position: absolute;
+	left: 0;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: 1px solid transparent;
+	-webkit-perspective: inherit;
+	perspective: inherit;
+	z-index: 2;
+}
+
+.card-logo{
+	display: block;
+	position: relative;
+	z-index: 3;
+	margin: 0 auto;
+	line-height: 2.85rem;
+}
+
+.front .card-logo svg path{
+	fill: #15293438;
+
+}
+
+.back .card-logo svg path{
+	fill: #ffffff3d;
+}
+
+.card-number{
+	font-weight: 800;
+	position: absolute;
+	margin-top: 12px;
+	margin-left: 12px;
+	z-index: 2;
+	font-size: 16px;
+	width: 1.8rem;
+	border-radius: 5px;
+	line-height: 1.6rem;
+	font-weight: 700;
+}
+
+.front .card-number{	
+	background: #15293438;
+	color: white;
+}
+
+.back .card-number{
+	background: #ffffff3d;
+	color: #152934;
+}
+
+.back-isflipped{
+	-webkit-transform: rotateY(0deg);
+	transform: rotateY(0deg);
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+
+}
+
+.front-isflipped{
+	-webkit-transform: rotateY(-180deg);
+	transform: rotateY(-180deg);
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+
+}
+
+/*@media all and (max-width: 1024px)
+
+{
+	.home-cta 
+	{
+		
+	}
+}
+
+*/
+
+
