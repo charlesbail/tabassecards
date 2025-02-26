@@ -61,6 +61,7 @@ class Game {
         // Clear any existing timer
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
+            this.timerInterval = null;
         }
 
         // Reset timer UI immediately
@@ -70,8 +71,9 @@ class Game {
         this.timerTextElement.style.bottom = '0%';
         this.timerTextElement.textContent = '7s';
 
-        // Force a reflow to ensure animation restarts
+        // Force reflow to ensure animation restarts
         this.timerElement.offsetHeight;
+        this.timerTextElement.offsetHeight;
 
         const startTime = Date.now();
         const updateTimer = () => {
@@ -105,10 +107,19 @@ class Game {
         // Reset timer immediately when starting to load new question
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
+            this.timerInterval = null;
         }
+        
+        // Force immediate reset of timer UI
         this.timerElement.style.height = '0%';
         this.timerTextElement.style.bottom = '0%';
         this.timerTextElement.classList.remove('finished');
+        this.timerTextElement.textContent = '7s';
+        this.timerTextElement.style.display = 'block';
+        
+        // Force reflow to ensure changes take effect
+        this.timerElement.offsetHeight;
+        this.timerTextElement.offsetHeight;
         
         // Create timeline for card transition
         const tl = gsap.timeline();
@@ -117,10 +128,15 @@ class Game {
         tl.to(this.cardContainer, {
             scale: 0.8,
             opacity: 0.5,
-            duration: 0.35,
-            ease: "power2.in",
+            duration: 0.05,
+            ease: "power1.in",
             onStart: () => {
                 this.cardContainer.style.pointerEvents = 'none';
+                // Ensure proper backface visibility during transition
+                this.cardFront.style.backfaceVisibility = 'hidden';
+                this.cardBack.style.backfaceVisibility = 'hidden';
+                this.cardFront.style.webkitBackfaceVisibility = 'hidden';
+                this.cardBack.style.webkitBackfaceVisibility = 'hidden';
             }
         })
         .call(() => {
@@ -159,8 +175,8 @@ class Game {
     }
 
     flipCard() {
-        const duration = 1.2;
-        const ease = "elastic.out(1, 1)";
+        const duration = 0.8;
+        const ease = "elastic.out(0.5, 1)";
 
         if (this.isFlipped) {
             gsap.to(this.cardFront, {
@@ -190,6 +206,10 @@ class Game {
 
     prevQuestion() {
         if (this.currentQuestionIndex > 0) {
+            // If card is flipped, flip it back first
+            if (this.isFlipped) {
+                this.flipCard();
+            }
             this.currentQuestionIndex--;
             this.loadQuestion();
         }
@@ -197,6 +217,10 @@ class Game {
 
     nextQuestion() {
         if (this.currentQuestionIndex < this.questions.length - 1) {
+            // If card is flipped, flip it back first
+            if (this.isFlipped) {
+                this.flipCard();
+            }
             this.currentQuestionIndex++;
             this.loadQuestion();
         }

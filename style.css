@@ -354,6 +354,8 @@ a
     transform-style: preserve-3d;
     border-radius: 16px;
     box-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+    will-change: transform;
+    visibility: visible;
 }
 
 .front {
