@@ -17,10 +17,12 @@
         </div>
 
         <div class="timer-container">
+            <div class="timer-text" id="timer-text">15s</div>
             <div class="timer" id="timer-bar"></div>
         </div>
 
         <div class="cardcont">
+            <div class="timer-end-text" id="timer-end-text">Fini !</div>
             <div class="front card-style">
                 <span class="card-number" id="front-nb">1</span>
                 <div class="inner">
@@ -39,20 +41,22 @@
         </div>
 
         <div class="button-wrapper">
-            <button class="answer-button wrong" id="wrong-answer">Incorrect ✗</button>
-            <button class="answer-button correct" id="correct-answer">Correct ✓</button>
+            <a class="main-button" id="prev-question">
+                <img src="assets/arrow_left.svg" alt="Question précédente">
+            </a>
+            <a class="main-button" id="next-question">
+                <img src="assets/arrow_right.svg" alt="Question suivante">
+            </a>
         </div>
 
-        <div class="display-answer" id="flip-card">
-            Retourner la carte
-        </div>
+        <div class="display-answer" id="flip-card">Retourner la carte</div>
     </div>
 
     <!-- History Modal -->
     <div class="modal" id="history-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Historique des réponses</h2>
+                <h2>Questions vues</h2>
                 <span class="close">&times;</span>
             </div>
             <div class="modal-body" id="history-list">

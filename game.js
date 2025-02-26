@@ -4,18 +4,14 @@ class Game {
     constructor() {
         this.questions = shuffleQuestions().slice(0, 15); // Get 15 random questions
         this.currentQuestionIndex = 0;
-        this.score = 0;
-        this.spiceCount = 0;
         this.history = [];
-        this.timer = null;
-        this.timeLeft = 30;
-        this.isFlipped = false;
+        this.timerDuration = 7000; // 7 seconds
+        this.timerInterval = null;
 
         // Initialize UI elements
         this.initializeUI();
         this.setupEventListeners();
         this.loadQuestion();
-        this.startTimer();
     }
 
     initializeUI() {
@@ -30,76 +26,73 @@ class Game {
         this.authorElement = document.getElementById('question-author');
         this.backCategoryElement = document.getElementById('back-category');
         
-        // Score elements
+        // Navigation elements
         this.currentScoreElement = document.getElementById('current-score');
         this.frontNumberElement = document.getElementById('front-nb');
         this.backNumberElement = document.getElementById('back-nb');
         
-        // Timer element
-        this.timerElement = document.getElementById('timer-bar');
-        
-        // Modals
+        // Modal
         this.historyModal = document.getElementById('history-modal');
-        this.gameOverModal = document.getElementById('game-over-modal');
-        this.takeSauceModal = document.getElementById('take-sauce-modal');
+        
+        // Timer elements
+        this.timerElement = document.getElementById('timer-bar');
+        this.timerTextElement = document.getElementById('timer-text');
+        this.timerEndText = document.getElementById('timer-end-text');
     }
 
     setupEventListeners() {
         // Flip card
         this.flipButton.addEventListener('click', () => this.flipCard());
         
-        // Answer buttons
-        document.getElementById('correct-answer').addEventListener('click', () => this.handleAnswer(true));
-        document.getElementById('wrong-answer').addEventListener('click', () => this.handleAnswer(false));
+        // Navigation buttons
+        document.getElementById('prev-question').addEventListener('click', () => this.prevQuestion());
+        document.getElementById('next-question').addEventListener('click', () => this.nextQuestion());
         
         // History button
         document.getElementById('show-history').addEventListener('click', () => this.showHistory());
-        document.querySelectorAll('.close').forEach(closeBtn => {
-            closeBtn.addEventListener('click', () => {
-                const modal = closeBtn.closest('.modal');
-                modal.classList.remove('show');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
-            });
-        });
-        
-        // Next after sauce
-        document.getElementById('next-after-sauce').addEventListener('click', () => {
-            this.takeSauceModal.classList.remove('show');
-            setTimeout(() => {
-                this.takeSauceModal.style.display = 'none';
-                this.nextQuestion();
-            }, 300);
-        });
-        
-        // Restart game
-        document.getElementById('restart-game').addEventListener('click', () => this.restartGame());
+        document.querySelector('.close').addEventListener('click', () => this.hideHistory());
     }
 
     startTimer() {
-        this.timeLeft = 30;
-        if (this.timer) clearInterval(this.timer);
-        
-        this.timer = setInterval(() => {
-            this.timeLeft--;
-            const percentage = (this.timeLeft / 30) * 100;
-            this.timerElement.style.height = `${percentage}%`;
-            
-            if (this.timeLeft <= 0) {
-                clearInterval(this.timer);
-                this.handleAnswer(false); // Auto-fail if time runs out
-            }
-        }, 1000);
-    }
+        // Clear any existing timer
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
 
-    flipCard() {
-        this.isFlipped = !this.isFlipped;
-        this.cardFront.classList.toggle('front-isflipped');
-        this.cardBack.classList.toggle('back-isflipped');
+        // Hide the end text when starting new timer
+        this.timerEndText.classList.remove('show');
+
+        const startTime = Date.now();
+        const updateTimer = () => {
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
+            const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
+            
+            this.timerElement.style.height = `${progress}%`;
+            
+            if (remaining > 0) {
+                this.timerTextElement.textContent = `${remaining}s`;
+            } else {
+                clearInterval(this.timerInterval);
+                this.timerTextElement.textContent = '';
+                this.timerElement.style.height = '100%';
+                this.timerEndText.classList.add('show');
+            }
+        };
+
+        // Reset timer
+        this.timerElement.style.height = '0%';
+        this.timerTextElement.textContent = '7s';
+        // Start new timer with more frequent updates
+        this.timerInterval = setInterval(updateTimer, 50);
+        // Run once immediately to prevent initial delay
+        updateTimer();
     }
 
     loadQuestion() {
+        // Hide the end text when loading new question
+        this.timerEndText.classList.remove('show');
+        
         const question = this.questions[this.currentQuestionIndex];
         
         // Update front of card
@@ -114,62 +107,50 @@ class Game {
         const questionNumber = this.currentQuestionIndex + 1;
         this.frontNumberElement.textContent = questionNumber;
         this.backNumberElement.textContent = questionNumber;
-        
-        // Reset card flip if needed
-        if (this.isFlipped) this.flipCard();
-        
-        // Start new timer
+        this.currentScoreElement.textContent = questionNumber;
+
+        // Add to history if not already there
+        if (!this.history.some(item => item.id === question.id)) {
+            this.history.push({
+                id: question.id,
+                question: question.question,
+                category: question.category
+            });
+        }
+
+        // Start the timer for the new question
         this.startTimer();
     }
 
-    handleAnswer(isCorrect) {
-        clearInterval(this.timer);
-        
-        if (isCorrect) {
-            this.score++;
-            this.currentScoreElement.textContent = this.score;
-            this.nextQuestion();
-        } else {
-            this.spiceCount++;
-            this.takeSauceModal.classList.add('show');
+    flipCard() {
+        this.cardFront.classList.toggle('front-isflipped');
+        this.cardBack.classList.toggle('back-isflipped');
+        // Don't stop the timer when flipping the card
+    }
+
+    prevQuestion() {
+        if (this.currentQuestionIndex > 0) {
+            this.currentQuestionIndex--;
+            this.loadQuestion();
         }
-        
-        // Add to history
-        this.history.push({
-            question: this.questions[this.currentQuestionIndex].question,
-            category: this.questions[this.currentQuestionIndex].category,
-            isCorrect
-        });
     }
 
     nextQuestion() {
-        this.currentQuestionIndex++;
-        
-        if (this.currentQuestionIndex >= this.questions.length) {
-            this.endGame();
-        } else {
-            if (this.takeSauceModal.classList.contains('show')) {
-                this.takeSauceModal.classList.remove('show');
-                setTimeout(() => {
-                    this.takeSauceModal.style.display = 'none';
-                    this.loadQuestion();
-                }, 300);
-            } else {
-                this.loadQuestion();
-            }
+        if (this.currentQuestionIndex < this.questions.length - 1) {
+            this.currentQuestionIndex++;
+            this.loadQuestion();
         }
     }
 
     showHistory() {
         const historyList = document.getElementById('history-list');
         historyList.innerHTML = this.history.map((item, index) => `
-            <div class="history-item ${item.isCorrect ? 'correct' : 'wrong'}">
+            <div class="history-item">
                 <div class="history-number">${index + 1}</div>
                 <div class="history-content">
                     <div class="history-category">${item.category}</div>
                     <div class="history-question">${item.question}</div>
                 </div>
-                <div class="history-result">${item.isCorrect ? '✓' : '✗'}</div>
             </div>
         `).join('');
         
@@ -183,29 +164,6 @@ class Game {
         this.historyModal.classList.remove('show');
         setTimeout(() => {
             this.historyModal.style.display = 'none';
-        }, 300); // Match the transition duration
-    }
-
-    endGame() {
-        document.getElementById('final-score').textContent = this.score;
-        document.getElementById('spice-count').textContent = this.spiceCount;
-        this.gameOverModal.style.display = 'block';
-        // Force reflow
-        this.gameOverModal.offsetHeight;
-        this.gameOverModal.classList.add('show');
-    }
-
-    restartGame() {
-        this.gameOverModal.classList.remove('show');
-        setTimeout(() => {
-            this.gameOverModal.style.display = 'none';
-            this.questions = shuffleQuestions().slice(0, 15);
-            this.currentQuestionIndex = 0;
-            this.score = 0;
-            this.spiceCount = 0;
-            this.history = [];
-            this.currentScoreElement.textContent = '0';
-            this.loadQuestion();
         }, 300);
     }
 }
