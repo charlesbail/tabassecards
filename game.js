@@ -4,7 +4,6 @@ class Game {
     constructor() {
         this.questions = shuffleQuestions().slice(0, 15); // Get 15 random questions
         this.currentQuestionIndex = 0;
-        this.history = [];
         this.timerDuration = 7000; // 7 seconds
         this.timerInterval = null;
         this.isFlipped = false;
@@ -32,12 +31,7 @@ class Game {
         this.backCategoryElement = document.getElementById('back-category');
         
         // Navigation elements
-        this.currentScoreElement = document.getElementById('current-score');
-        this.frontNumberElement = document.getElementById('front-nb');
-        this.backNumberElement = document.getElementById('back-nb');
-        
-        // Modal
-        this.historyModal = document.getElementById('history-modal');
+        this.progressCounter = document.getElementById('progress-counter');
         
         // Timer elements
         this.timerElement = document.getElementById('timer-bar');
@@ -51,10 +45,6 @@ class Game {
         // Navigation buttons
         document.getElementById('prev-question').addEventListener('click', () => this.prevQuestion());
         document.getElementById('next-question').addEventListener('click', () => this.nextQuestion());
-        
-        // History button
-        document.getElementById('show-history').addEventListener('click', () => this.showHistory());
-        document.querySelector('.close').addEventListener('click', () => this.hideHistory());
     }
 
     startTimer() {
@@ -139,6 +129,11 @@ class Game {
                 this.cardBack.style.webkitBackfaceVisibility = 'hidden';
             }
         })
+        .to('.timer-container', {
+            y: 10,
+            duration: 0.05,
+            ease: "power1.in"
+        }, "<")
         .call(() => {
             // Update content
             this.categoryElement.textContent = question.category;
@@ -146,20 +141,9 @@ class Game {
             this.authorElement.textContent = `Par ${question.author}`;
             this.backCategoryElement.textContent = question.category;
             
-            // Update question number
+            // Update question number in progress counter
             const questionNumber = this.currentQuestionIndex + 1;
-            this.frontNumberElement.textContent = questionNumber;
-            this.backNumberElement.textContent = questionNumber;
-            this.currentScoreElement.textContent = questionNumber;
-
-            // Add to history if not already there
-            if (!this.history.some(item => item.id === question.id)) {
-                this.history.push({
-                    id: question.id,
-                    question: question.question,
-                    category: question.category
-                });
-            }
+            this.progressCounter.textContent = `${questionNumber}/15`;
         })
         // Scale up and fade in
         .to(this.cardContainer, {
@@ -171,12 +155,17 @@ class Game {
                 this.cardContainer.style.pointerEvents = 'auto';
                 this.startTimer();
             }
-        });
+        })
+        .to('.timer-container', {
+            y: 0,
+            duration: 0.7,
+            ease: "elastic.out(1.2, 0.5)"
+        }, "<");
     }
 
     flipCard() {
-        const duration = 0.8;
-        const ease = "elastic.out(0.5, 1)";
+        const duration = 0.95;
+        const ease = "elastic.out(0.5, 0.5)";
 
         if (this.isFlipped) {
             gsap.to(this.cardFront, {
@@ -224,31 +213,6 @@ class Game {
             this.currentQuestionIndex++;
             this.loadQuestion();
         }
-    }
-
-    showHistory() {
-        const historyList = document.getElementById('history-list');
-        historyList.innerHTML = this.history.map((item, index) => `
-            <div class="history-item">
-                <div class="history-number">${index + 1}</div>
-                <div class="history-content">
-                    <div class="history-category">${item.category}</div>
-                    <div class="history-question">${item.question}</div>
-                </div>
-            </div>
-        `).join('');
-        
-        this.historyModal.style.display = 'block';
-        // Force reflow
-        this.historyModal.offsetHeight;
-        this.historyModal.classList.add('show');
-    }
-
-    hideHistory() {
-        this.historyModal.classList.remove('show');
-        setTimeout(() => {
-            this.historyModal.style.display = 'none';
-        }, 300);
     }
 }
 

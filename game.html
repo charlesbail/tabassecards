@@ -9,22 +9,15 @@
 </head>
 <body>
     <div class="game-wrapper">
-        <div class="score-container">
-            <div class="score">
-                <span id="current-score">0</span>/<span id="total-questions">15</span>
-                <button class="history-button" id="show-history" title="Voir l'historique">📋</button>
-            </div>
+        <div class="logo-container">
         </div>
-
-
-
+        
         <div class="cardcont">
             <div class="front card-style">
                 <div class="timer-container">
                     <div class="timer-text" id="timer-text">15s</div>
                     <div class="timer" id="timer-bar"></div>
                 </div>
-                <span class="card-number" id="front-nb">1</span>
                 <div class="inner">
                     <div class="category" id="question-category">Culture Générale</div>
                     <div class="question" id="question-text">Quel est l'ingrédient qui rend les piments piquants ?</div>
@@ -32,7 +25,6 @@
                 </div>
             </div>
             <div class="back card-style">
-                <span class="card-number" id="back-nb">1</span>
                 <div class="inner">
                     <div class="category" id="back-category">Culture Générale</div>
                     <div class="tabasse-logo">TABASSE</div>
@@ -44,25 +36,13 @@
             <a class="main-button" id="prev-question">
                 <img src="assets/arrow_left.svg" alt="Question précédente">
             </a>
+            <div id="progress-counter">1/15</div>
             <a class="main-button" id="next-question">
                 <img src="assets/arrow_right.svg" alt="Question suivante">
             </a>
         </div>
 
         <div class="display-answer" id="flip-card">Retourner la carte</div>
-    </div>
-
-    <!-- History Modal -->
-    <div class="modal" id="history-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Questions vues</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body" id="history-list">
-                <!-- History items will be inserted here -->
-            </div>
-        </div>
     </div>
 
     <!-- Game Over Modal -->
