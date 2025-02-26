@@ -4,7 +4,7 @@ class Game {
     constructor() {
         this.allQuestions = [...questions];
         this.currentQuestionIndex = 0;
-        this.timerDuration = 7000;
+        this.timerDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer-duration')) * 1000;
         this.timerInterval = null;
         this.isFlipped = false;
 
@@ -62,9 +62,9 @@ class Game {
         timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
         
         this.timerTextElement.style.display = 'block';
-        this.timerTextElement.style.transform = 'translate(-9px, -60px) rotate(-8deg)';
+        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
         this.timerTextElement.style.background = '#FF00B5';
-        this.timerTextElement.textContent = '7s';
+        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
 
         timerBar.offsetHeight;
         this.timerTextElement.offsetHeight;
@@ -78,7 +78,7 @@ class Game {
             const endY = 204 - ((204 - 17) * (progress / 100));
             timerBar.setAttribute('d', `M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V${endY}H31V204Z`);
             
-            const textPosition = -60 - ((204 - endY) *0.8);
+            const textPosition = -50 - ((204 - endY) *0.8);
             this.timerTextElement.style.transform = `translate(-9px, ${textPosition}px) rotate(-8deg)`;
             
             if (remaining > 0) {
@@ -104,9 +104,9 @@ class Game {
         
         const timerBar = document.getElementById('timer-bar');
         timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
-        this.timerTextElement.style.transform = 'translate(-9px, -60px) rotate(-8deg)';
+        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
         this.timerTextElement.style.background = '#FF00B5';
-        this.timerTextElement.textContent = '7s';
+        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
         this.timerTextElement.style.display = 'block';
         
         timerBar.offsetHeight;

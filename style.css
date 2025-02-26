@@ -9,6 +9,7 @@
 	--success-color: #34C759;
 	--vh: 100%;
 	--real-vh: 1vh;
+	--timer-duration: 40s;
 }
 
 html, body {
@@ -74,6 +75,19 @@ a
 	font-weight: 700;
 	color:white;
 	text-shadow: 0px 20px 36px rgba(157, 60, 114, 0.3);
+}
+
+#flames{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("assets/flames.svg");
+	background-size: contain;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    top: 0;
+    left: 0;
+    z-index: -999;
 }
 
 #message1,
@@ -672,12 +686,13 @@ line-height: normal;
     -moz-user-select: none;
     -ms-user-select: none;
     font-family: "Space Grotesk";
-    font-size: 21px;
+    font-size: 19px;
     font-style: normal;
     font-weight: 700;
     line-height: 21px;
     letter-spacing: -0.63px;
     margin: 0;
+    white-space: pre-wrap;
 }
 
 .author {
@@ -848,6 +863,32 @@ line-height: normal;
 	border-radius: 50px;
 	transition: 300ms;
 	width: 0px;
+}
+
+.credit-line {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: auto;
+}
+
+.credit-line a {
+    background: linear-gradient(180deg, #DC00EE 0%, #7900FF 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    mix-blend-mode: screen;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.credit-line a:hover {
+    opacity: 0.8;
+}
+
+.credit-line span {
+    color: #7900FF;
+    margin: 0 4px;
 }
 
 
