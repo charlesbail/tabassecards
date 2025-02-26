@@ -2,11 +2,17 @@ import { questions, shuffleQuestions } from './questions.js';
 
 class Game {
     constructor() {
+        this.allQuestions = [...questions]; // Store all questions
         this.questions = shuffleQuestions().slice(0, 15); // Get 15 random questions
         this.currentQuestionIndex = 0;
         this.timerDuration = 7000; // 7 seconds
         this.timerInterval = null;
         this.isFlipped = false;
+
+        // Handle viewport height
+        this.handleViewportHeight();
+        window.addEventListener('resize', () => this.handleViewportHeight());
+        window.addEventListener('orientationchange', () => this.handleViewportHeight());
 
         // Initialize UI elements
         this.initializeUI();
@@ -17,12 +23,18 @@ class Game {
         gsap.set(this.cardBack, { rotationY: 180 });
     }
 
+    handleViewportHeight() {
+        // Get the actual viewport height
+        const vh = window.innerHeight * 0.01;
+        // Set the value on the root element
+        document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+    }
+
     initializeUI() {
         // Card elements
         this.cardContainer = document.querySelector('.cardcont');
         this.cardFront = document.querySelector('.front');
         this.cardBack = document.querySelector('.back');
-        this.flipButton = document.getElementById('flip-card');
         
         // Question elements
         this.categoryElement = document.getElementById('question-category');
@@ -39,12 +51,11 @@ class Game {
     }
 
     setupEventListeners() {
-        // Flip card
-        this.flipButton.addEventListener('click', () => this.flipCard());
+        // Add click event to the card container
+        this.cardContainer.addEventListener('click', () => this.flipCard());
         
-        // Navigation buttons
-        document.getElementById('prev-question').addEventListener('click', () => this.prevQuestion());
-        document.getElementById('next-question').addEventListener('click', () => this.nextQuestion());
+        // Navigation button
+        document.querySelector('.shuffle-button').addEventListener('click', () => this.pickRandomQuestion());
     }
 
     startTimer() {
@@ -55,14 +66,17 @@ class Game {
         }
 
         // Reset timer UI immediately
-        this.timerElement.style.height = '0%';
-        this.timerTextElement.classList.remove('finished');
+        const timerBar = document.getElementById('timer-bar');
+        timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
+        
+        // Don't remove finished class, just update the text and position
         this.timerTextElement.style.display = 'block';
-        this.timerTextElement.style.bottom = '0%';
+        this.timerTextElement.style.transform = 'translate(-9px, -60px) rotate(-8deg)';
+        this.timerTextElement.style.background = '#FF00B5';
         this.timerTextElement.textContent = '7s';
 
         // Force reflow to ensure animation restarts
-        this.timerElement.offsetHeight;
+        timerBar.offsetHeight;
         this.timerTextElement.offsetHeight;
 
         const startTime = Date.now();
@@ -71,22 +85,26 @@ class Game {
             const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
             const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
-            // Update timer bar height
-            this.timerElement.style.height = `${progress}%`;
+            // Calculate the end Y position based on progress (from 204 to 17)
+            const endY = 204 - ((204 - 17) * (progress / 100));
+            timerBar.setAttribute('d', `M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V${endY}H31V204Z`);
             
-            // Update timer text position and content
+            // Calculate text position to match bar progression
+            const textPosition = -60 - ((204 - endY) *0.8);
+            this.timerTextElement.style.transform = `translate(-9px, ${textPosition}px) rotate(-8deg)`;
+            
+            // Update timer text content
             if (remaining > 0) {
-                this.timerTextElement.style.bottom = `${progress}%`;
                 this.timerTextElement.textContent = `${remaining}s`;
             } else {
-                this.timerTextElement.textContent = 'FINI!';
-                this.timerTextElement.classList.add('finished');
+                this.timerTextElement.textContent = '🔥';
+                this.timerTextElement.style.background = '#FFB803';
                 clearInterval(this.timerInterval);
             }
         };
 
-        // Start new timer with more frequent updates
-        this.timerInterval = setInterval(updateTimer, 50);
+        // Start new timer with more frequent updates for smoother animation
+        this.timerInterval = setInterval(updateTimer, 16); // ~60fps for smoother animation
         // Run once immediately to prevent initial delay
         updateTimer();
     }
@@ -101,14 +119,15 @@ class Game {
         }
         
         // Force immediate reset of timer UI
-        this.timerElement.style.height = '0%';
-        this.timerTextElement.style.bottom = '0%';
-        this.timerTextElement.classList.remove('finished');
+        const timerBar = document.getElementById('timer-bar');
+        timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
+        this.timerTextElement.style.transform = 'translate(-9px, -60px) rotate(-8deg)';
+        this.timerTextElement.style.background = '#FF00B5';
         this.timerTextElement.textContent = '7s';
         this.timerTextElement.style.display = 'block';
         
         // Force reflow to ensure changes take effect
-        this.timerElement.offsetHeight;
+        timerBar.offsetHeight;
         this.timerTextElement.offsetHeight;
         
         // Create timeline for card transition
@@ -193,17 +212,6 @@ class Game {
         this.isFlipped = !this.isFlipped;
     }
 
-    prevQuestion() {
-        if (this.currentQuestionIndex > 0) {
-            // If card is flipped, flip it back first
-            if (this.isFlipped) {
-                this.flipCard();
-            }
-            this.currentQuestionIndex--;
-            this.loadQuestion();
-        }
-    }
-
     nextQuestion() {
         if (this.currentQuestionIndex < this.questions.length - 1) {
             // If card is flipped, flip it back first
@@ -213,6 +221,30 @@ class Game {
             this.currentQuestionIndex++;
             this.loadQuestion();
         }
+    }
+
+    pickRandomQuestion() {
+        // If card is flipped, flip it back first
+        if (this.isFlipped) {
+            this.flipCard();
+        }
+
+        // Get a random question from all available questions
+        const randomIndex = Math.floor(Math.random() * this.allQuestions.length);
+        const randomQuestion = this.allQuestions[randomIndex];
+
+        // Move to next question index, loop back to start if at the end
+        if (this.currentQuestionIndex === this.questions.length - 1) {
+            this.currentQuestionIndex = 0;
+        } else {
+            this.currentQuestionIndex++;
+        }
+
+        // Replace next question with the random one
+        this.questions[this.currentQuestionIndex] = randomQuestion;
+        
+        // Load the new question
+        this.loadQuestion();
     }
 }
 
