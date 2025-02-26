@@ -1,11 +1,16 @@
 var messages = ["😀","😅","🤩","😜","🤪","🤐","🥵","🤯","🤠","🧐","🥺","😱","🤓","😎","🥳","🥴","😏"];
 
 
-var tv = new TimelineMax({
+var tv = new TimelineMax({});
 
-});
-
-tv.fromTo(".main-wrapper", 0.35, {scale:1.5,opacity:0, ease:Power2.easeOuteaseOut}, {scale:1,opacity:1},0.2);
+tv.fromTo(".main-wrapper", 0.35, {
+	scale: 1.5,
+	opacity: 0,
+	ease: Power2.easeOut
+}, {
+	scale: 1,
+	opacity: 1
+}, 0.2);
 
 var tl = new TimelineMax({
 	onComplete: function() {
@@ -39,6 +44,30 @@ tl.to(["#message1","#message2"], 2.2, {  });
 //         // tv.reverse();
 //         tv.staggerTo(".main-wrapper", 0.3, {opacity:0, scale:1.5, ease:Back.easeIn, onComplete: function(){ goToGame();} }, 0.3);
 //    });
+
+// Animate stacked cards
+tv.staggerFromTo(".stacked-card", 0.5, {
+	y: 100,
+	opacity: 0,
+	ease: Power2.easeOut
+}, {
+	y: 0,
+	opacity: 1,
+	ease: Power2.easeOut
+}, 0.1);
+
+// Handle start button click
+document.getElementById('start-button').addEventListener('click', function(e) {
+	e.preventDefault();
+	tv.to(".main-wrapper", 0.3, {
+		opacity: 0,
+		scale: 1.5,
+		ease: Back.easeIn,
+		onComplete: function() {
+			window.location.href = "game.html";
+		}
+	});
+});
 
 
 
