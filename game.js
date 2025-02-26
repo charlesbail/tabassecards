@@ -7,15 +7,20 @@ class Game {
         this.history = [];
         this.timerDuration = 7000; // 7 seconds
         this.timerInterval = null;
+        this.isFlipped = false;
 
         // Initialize UI elements
         this.initializeUI();
         this.setupEventListeners();
         this.loadQuestion();
+
+        // Set initial transforms
+        gsap.set(this.cardBack, { rotationY: 180 });
     }
 
     initializeUI() {
         // Card elements
+        this.cardContainer = document.querySelector('.cardcont');
         this.cardFront = document.querySelector('.front');
         this.cardBack = document.querySelector('.back');
         this.flipButton = document.getElementById('flip-card');
@@ -37,7 +42,6 @@ class Game {
         // Timer elements
         this.timerElement = document.getElementById('timer-bar');
         this.timerTextElement = document.getElementById('timer-text');
-        this.timerEndText = document.getElementById('timer-end-text');
     }
 
     setupEventListeners() {
@@ -59,8 +63,15 @@ class Game {
             clearInterval(this.timerInterval);
         }
 
-        // Hide the end text when starting new timer
-        this.timerEndText.classList.remove('show');
+        // Reset timer UI immediately
+        this.timerElement.style.height = '0%';
+        this.timerTextElement.classList.remove('finished');
+        this.timerTextElement.style.display = 'block';
+        this.timerTextElement.style.bottom = '0%';
+        this.timerTextElement.textContent = '7s';
+
+        // Force a reflow to ensure animation restarts
+        this.timerElement.offsetHeight;
 
         const startTime = Date.now();
         const updateTimer = () => {
@@ -68,21 +79,20 @@ class Game {
             const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
             const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
+            // Update timer bar height
             this.timerElement.style.height = `${progress}%`;
             
+            // Update timer text position and content
             if (remaining > 0) {
+                this.timerTextElement.style.bottom = `${progress}%`;
                 this.timerTextElement.textContent = `${remaining}s`;
             } else {
+                this.timerTextElement.textContent = 'FINI!';
+                this.timerTextElement.classList.add('finished');
                 clearInterval(this.timerInterval);
-                this.timerTextElement.textContent = '';
-                this.timerElement.style.height = '100%';
-                this.timerEndText.classList.add('show');
             }
         };
 
-        // Reset timer
-        this.timerElement.style.height = '0%';
-        this.timerTextElement.textContent = '7s';
         // Start new timer with more frequent updates
         this.timerInterval = setInterval(updateTimer, 50);
         // Run once immediately to prevent initial delay
@@ -90,42 +100,92 @@ class Game {
     }
 
     loadQuestion() {
-        // Hide the end text when loading new question
-        this.timerEndText.classList.remove('show');
-        
         const question = this.questions[this.currentQuestionIndex];
         
-        // Update front of card
-        this.categoryElement.textContent = question.category;
-        this.questionElement.textContent = question.question;
-        this.authorElement.textContent = `Par ${question.author}`;
-        
-        // Update back of card
-        this.backCategoryElement.textContent = question.category;
-        
-        // Update question number
-        const questionNumber = this.currentQuestionIndex + 1;
-        this.frontNumberElement.textContent = questionNumber;
-        this.backNumberElement.textContent = questionNumber;
-        this.currentScoreElement.textContent = questionNumber;
-
-        // Add to history if not already there
-        if (!this.history.some(item => item.id === question.id)) {
-            this.history.push({
-                id: question.id,
-                question: question.question,
-                category: question.category
-            });
+        // Reset timer immediately when starting to load new question
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
         }
+        this.timerElement.style.height = '0%';
+        this.timerTextElement.style.bottom = '0%';
+        this.timerTextElement.classList.remove('finished');
+        
+        // Create timeline for card transition
+        const tl = gsap.timeline();
+        
+        // Scale down and fade out
+        tl.to(this.cardContainer, {
+            scale: 0.8,
+            opacity: 0.5,
+            duration: 0.35,
+            ease: "power2.in",
+            onStart: () => {
+                this.cardContainer.style.pointerEvents = 'none';
+            }
+        })
+        .call(() => {
+            // Update content
+            this.categoryElement.textContent = question.category;
+            this.questionElement.textContent = question.question;
+            this.authorElement.textContent = `Par ${question.author}`;
+            this.backCategoryElement.textContent = question.category;
+            
+            // Update question number
+            const questionNumber = this.currentQuestionIndex + 1;
+            this.frontNumberElement.textContent = questionNumber;
+            this.backNumberElement.textContent = questionNumber;
+            this.currentScoreElement.textContent = questionNumber;
 
-        // Start the timer for the new question
-        this.startTimer();
+            // Add to history if not already there
+            if (!this.history.some(item => item.id === question.id)) {
+                this.history.push({
+                    id: question.id,
+                    question: question.question,
+                    category: question.category
+                });
+            }
+        })
+        // Scale up and fade in
+        .to(this.cardContainer, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.7,
+            ease: "elastic.out(1.2, 0.5)",
+            onComplete: () => {
+                this.cardContainer.style.pointerEvents = 'auto';
+                this.startTimer();
+            }
+        });
     }
 
     flipCard() {
-        this.cardFront.classList.toggle('front-isflipped');
-        this.cardBack.classList.toggle('back-isflipped');
-        // Don't stop the timer when flipping the card
+        const duration = 1.2;
+        const ease = "elastic.out(1, 1)";
+
+        if (this.isFlipped) {
+            gsap.to(this.cardFront, {
+                rotationY: 0,
+                duration: duration,
+                ease: ease
+            });
+            gsap.to(this.cardBack, {
+                rotationY: 180,
+                duration: duration,
+                ease: ease
+            });
+        } else {
+            gsap.to(this.cardFront, {
+                rotationY: -180,
+                duration: duration,
+                ease: ease
+            });
+            gsap.to(this.cardBack, {
+                rotationY: 0,
+                duration: duration,
+                ease: ease
+            });
+        }
+        this.isFlipped = !this.isFlipped;
     }
 
     prevQuestion() {
