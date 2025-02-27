@@ -15,6 +15,7 @@ class Game {
     init() {
         this.allQuestions = [...questions];
         this.currentQuestionIndex = 0;
+        this.timerBasePosition = 40;
         this.timerDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer-duration')) * 1000;
         this.timerInterval = null;
         this.isFlipped = false;
@@ -89,20 +90,18 @@ class Game {
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
         
-        // Reset initial positions
-        gsap.set(this.timerBar, {
-            height: 0,
-            clearProps: "background"
-        });
-        
-        const TIMER_BOTTOM = 36; // Base position in pixels
-
+        // Reset initial positions and styles
         gsap.set(this.timerTextElement, {
-            bottom: `${TIMER_BOTTOM}px`,
+            y: 0,
             scale: 1,
             rotation: -8,
             backgroundColor: "#FF00B5",
-            transform: "translateX(50%) rotate(-8deg)"
+            bottom: `${this.timerBasePosition}px`,
+            transform: "translateX(50%)",
+            display: "flex"
+        });
+        gsap.set(this.timerBar, {
+            height: 0
         });
 
         // Animate the progress bar
@@ -122,10 +121,7 @@ class Game {
             const barHeight = progress * 191;
             
             // Update timer position while maintaining horizontal centering
-            gsap.set(this.timerTextElement, {
-                bottom: TIMER_BOTTOM + barHeight,
-                transform: "translateX(50%) rotate(-8deg)"
-            });
+            this.timerTextElement.style.bottom = `${this.timerBasePosition + barHeight}px`;
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
@@ -133,12 +129,13 @@ class Game {
                 this.timerTextElement.textContent = '🔥';
                 this.timerTextElement.classList.add('finished');
                 gsap.to(this.timerTextElement, {
-                    scale: 1.5,
+                    scale: 2,
                     rotation: -8,
-                    duration: 0.6,
-                    ease: "elastic.out(1,0.3)",
+                    duration: 2.2,
+					y: -16,
+                    ease: "elastic.out(1.15,0.2)",
                     backgroundColor: "#FFB803",
-                    transform: "translateX(50%) rotate(-8deg) scale(1.5)"
+                    transform: "translateX(50%) rotate(-8deg)"
                 });
                 clearInterval(this.timerInterval);
             }
@@ -149,18 +146,30 @@ class Game {
     }
 
     loadQuestion() {
-        const question = this.allQuestions[this.currentQuestionIndex];
-        
-        // Reset and start timer immediately
+        // Clear any existing timers and animations
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
+        gsap.killTweensOf([this.timerTextElement, this.timerBar]);
 
-        // Kill any existing GSAP animations before starting new ones
-        gsap.killTweensOf(this.timerTextElement);
+        // Immediately reset timer text appearance
+        this.timerTextElement.classList.remove('finished');
+        this.timerTextElement.style.display = 'flex';
+        this.timerTextElement.style.transform = "translateX(50%) rotate(-8deg)";
+        this.timerTextElement.style.scale = "1";
+        this.timerTextElement.style.backgroundColor = "#FF00B5";
+        this.timerTextElement.style.bottom = "36px";
+        this.timerBar.style.height = '0px';
         
+        // Force browser reflow
+        void this.timerTextElement.offsetHeight;
+        void this.timerBar.offsetHeight;
+
+        // Start timer immediately
         this.startTimer();
+        
+        const question = this.allQuestions[this.currentQuestionIndex];
         
         const tl = gsap.timeline();
         
