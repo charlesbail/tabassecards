@@ -1,10 +1,5 @@
 import { questions } from './questions.js';
 
-// Initialisation des variables 
-var isDisplayed = false;
-var btnClose = document.querySelector('.display-answer');
-var cardFront = document.querySelector('.front');
-var cardBack = document.querySelector('.back');
 
 // Game class
 class Game {
