@@ -5,7 +5,7 @@
 	--light-color: #FFFFFF;
 	--vh: 100%;
 	--real-vh: 1vh;
-	--timer-duration: 40s;
+	--timer-duration: 12s;
 }
 
 html, body {
@@ -242,24 +242,69 @@ a
     position: absolute;
     right: -12px;
     top: 40px;
-    width: 40px;
-    height: 240px;
+    width: 34px;
+    height: 224px;
     overflow: visible;
     z-index: 3;
     transform: translateZ(50px);
     backface-visibility: visible;
+    filter: drop-shadow(0px 10px 18px rgba(64, 0, 115, 0.25));
 }
 
-.timer-container svg {
+#thermo-svg {
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transform: scale(1.5);
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
 }
 
-#timer-bar {
+.timer-bar {
+    position: absolute;
+    left: 13px;
+    bottom: 28px;
+    width: 8px;
+    height: 0;
+    border-radius: 24px 24px 0px 0px;
+    background: linear-gradient(180deg, #FB0 0%, #FF0089 45.99%, #FF00B5 91.97%);
     transition: height 0.1s linear;
     transform-origin: bottom;
+    z-index: 2;
+}
+
+.timer-text {
+    position: absolute;
+    right: 50%;
+    transform: translate(50%, -50%);
+    background: #FF00B5;
+    box-shadow: 0px 2px 3px 0px rgba(64, 0, 115, 0.10);
+    color: var(--light-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 14px;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: max-content;
+}
+
+.timer-text.finished {
+    background: #FFB803;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+    0% {
+        transform: translate(50%, -50%) scale(0.8);
+    }
+    100% {
+        transform: translate(50%, -50%) scale(1);
+    }
 }
 
 .display-answer {
@@ -416,36 +461,6 @@ a
 
 .timer::after {
     display: none;
-}
-
-.timer-text {
-    position: absolute;
-    bottom: 0;
-    right: -4px;
-    transform: translate(0, -30px) rotate(-8deg);
-	background: #FF00B5;
-	box-shadow: 0px 2px 3px 0px rgba(64, 0, 115, 0.10);
-    color: var(--light-color);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 900;
-    font-size: 14px;
-    z-index: 10;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    white-space: nowrap;
-}
-
-.timer-text.finished {
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes popIn {
-    0% {
-        transform: translate(0, -30px) rotate(-8deg) scale(0.8);
-    }
-    100% {
-        transform: translate(0, -30px) rotate(-8deg) scale(1);
-    }
 }
 
 .cardcont {

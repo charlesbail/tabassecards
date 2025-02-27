@@ -4,11 +4,22 @@ import { questions } from './questions.js';
 // Game class
 class Game {
     constructor() {
+        // Wait for DOM content to be loaded before initializing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
+    }
+
+    init() {
         this.allQuestions = [...questions];
         this.currentQuestionIndex = 0;
         this.timerDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer-duration')) * 1000;
         this.timerInterval = null;
         this.isFlipped = false;
+        this.thermoSvg = null;
+        this.thermoBar = null;
 
         // Handle viewport height
         this.handleViewportHeight();
@@ -18,10 +29,12 @@ class Game {
         // Initialize UI elements
         this.initializeUI();
         this.setupEventListeners();
-        this.loadQuestion();
 
         // Set initial transforms
         gsap.set(this.cardBack, { rotationY: 180 });
+
+        // Load the first question after initialization
+        this.loadQuestion();
     }
 
     handleViewportHeight() {
@@ -42,8 +55,16 @@ class Game {
         this.backCategoryElement = document.getElementById('back-category');
         
         // Timer elements
-        this.timerElement = document.getElementById('timer-bar');
         this.timerTextElement = document.getElementById('timer-text');
+        
+        // Create and add the timer bar
+        const timerContainer = document.querySelector('.timer-container');
+        this.timerBar = document.createElement('div');
+        this.timerBar.className = 'timer-bar';
+        timerContainer.appendChild(this.timerBar);
+        
+        // Start the first timer
+        this.startTimer();
     }
 
     setupEventListeners() {
@@ -60,34 +81,31 @@ class Game {
             this.timerInterval = null;
         }
 
-        const timerBar = document.getElementById('timer-bar');
-        timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
-        
-        this.timerTextElement.style.display = 'block';
-        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
-        this.timerTextElement.style.background = '#FF00B5';
+        // Reset timer state
+        this.timerBar.style.height = '0px';
+        this.timerTextElement.style.display = 'flex';
+        this.timerTextElement.style.bottom = '28px';
+        this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
-
-        timerBar.offsetHeight;
-        this.timerTextElement.offsetHeight;
 
         const startTime = Date.now();
         const updateTimer = () => {
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
-            const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
+            const progress = Math.min((elapsed / this.timerDuration), 1);
             
-            const endY = 204 - ((204 - 17) * (progress / 100));
-            timerBar.setAttribute('d', `M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V${endY}H31V204Z`);
+            // Update bar height (191px is the maximum height)
+            const barHeight = progress * 191;
+            this.timerBar.style.height = `${barHeight}px`;
             
-            const textPosition = -50 - ((204 - endY) *0.8);
-            this.timerTextElement.style.transform = `translate(-9px, ${textPosition}px) rotate(-8deg)`;
+            // Update timer text position
+            this.timerTextElement.style.bottom = `${12 + barHeight}px`;
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
             } else {
                 this.timerTextElement.textContent = '🔥';
-                this.timerTextElement.style.background = '#FFB803';
+                this.timerTextElement.classList.add('finished');
                 clearInterval(this.timerInterval);
             }
         };
@@ -99,20 +117,15 @@ class Game {
     loadQuestion() {
         const question = this.allQuestions[this.currentQuestionIndex];
         
+        // Reset and start timer immediately
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
-        
-        const timerBar = document.getElementById('timer-bar');
-        timerBar.setAttribute('d', 'M31 204C31 206.209 32.7909 208 35 208V208C37.2091 208 39 206.209 39 204V204H31V204Z');
-        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
-        this.timerTextElement.style.background = '#FF00B5';
-        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
-        this.timerTextElement.style.display = 'block';
-        
-        timerBar.offsetHeight;
-        this.timerTextElement.offsetHeight;
+        this.timerBar.style.height = '0px';
+        this.timerTextElement.style.bottom = '28px';
+        this.timerTextElement.classList.remove('finished');
+        this.startTimer();
         
         const tl = gsap.timeline();
         
@@ -147,7 +160,6 @@ class Game {
             ease: "elastic.out(1.2, 0.5)",
             onComplete: () => {
                 this.cardContainer.style.pointerEvents = 'auto';
-                this.startTimer();
             }
         })
         .to('.timer-container', {
