@@ -146,11 +146,11 @@ class Game {
                             ease: "elastic.out(1.15, 0.2)",
                             backgroundColor: "#FFB803",
                             onComplete: () => {
-                                // Start the looping animation after the pop
+                                // Start the looping animation
                                 gsap.from(this.timerTextElement, {
-                                    scale: 2,  // Start from the pop animation end state
-                                    rotation: -8,  // Start from the pop animation end state
-                                    duration: 0  // Immediate start
+                                    scale: 2,
+                                    rotation: -8,
+                                    duration: 0
                                 });
                                 
                                 gsap.timeline({
