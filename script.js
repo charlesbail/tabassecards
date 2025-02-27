@@ -18,6 +18,7 @@ class Game {
         this.timerBasePosition = 40;
         this.timerDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer-duration')) * 1000;
         this.timerInterval = null;
+        this.completionTimeout = null;
         this.isFlipped = false;
         this.thermoSvg = null;
         this.thermoBar = null;
@@ -77,15 +78,20 @@ class Game {
     }
 
     startTimer() {
+        // Clear any existing timers and animations
         if (this.timerInterval) {
-            clearInterval(this.timerInterval);
+            cancelAnimationFrame(this.timerInterval);
             this.timerInterval = null;
+        }
+        if (this.completionTimeout) {
+            clearTimeout(this.completionTimeout);
+            this.completionTimeout = null;
         }
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
 
         // Reset timer text with a fixed starting position
         this.timerTextElement.style.display = 'block';
-        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)'; // Fixed starting position
+        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
         this.timerTextElement.style.background = '#FF00B5';
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
@@ -100,8 +106,8 @@ class Game {
             const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
             // Simplified positioning using a single range
-            const START_POSITION = 24;  // Starting Y position
-            const TRAVEL_DISTANCE = -208;  // Total distance to travel
+            const START_POSITION = 24;
+            const TRAVEL_DISTANCE = -208;
             const currentPosition = START_POSITION + (TRAVEL_DISTANCE * (progress / 100));
             
             // Update timer bar height
@@ -112,37 +118,71 @@ class Game {
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
-                requestAnimationFrame(updateTimer);
+                this.timerInterval = requestAnimationFrame(updateTimer);
             } else {
-                // Final animation
-                this.timerTextElement.textContent = '🔥';
-                this.timerTextElement.classList.add('finished');
+                // Wait for the text to reach final position before starting animation
+                const finalY = START_POSITION + TRAVEL_DISTANCE;
+                this.timerTextElement.style.transform = `translate(-9px, ${finalY}px) rotate(-8deg)`;
                 
-                gsap.timeline()
-                    .to(this.timerTextElement, {
-                        scale: 0.8,
-                        rotation: -15,
-                        duration: 0.15,
-                        ease: "power2.in"
-                    })
-                    .to(this.timerTextElement, {
-                        scale: 1.5,
-                        rotation: -8,
-                        duration: 0.8,
-                        ease: "elastic.out(1, 0.3)",
-                        backgroundColor: "#FFB803"
-                    });
+                // Store the timeout reference so we can clear it if needed
+                this.completionTimeout = setTimeout(() => {
+                    if (!this.completionTimeout) return; // Exit if cleared
+                    this.timerTextElement.textContent = '🔥';
+                    this.timerTextElement.classList.add('finished');
+                    
+                    // Initial pop animation
+                    gsap.timeline()
+                        .to(this.timerTextElement, {
+                            scale: 0.8,
+                            rotation: -15,
+                            y: finalY - 24,
+                            duration: 0.15,
+                            ease: "power2.in"
+                        })
+                        .to(this.timerTextElement, {
+                            scale: 2,
+                            rotation: -8,
+                            duration: 0.8,
+                            ease: "elastic.out(1.15, 0.2)",
+                            backgroundColor: "#FFB803",
+                            onComplete: () => {
+                                // Start the looping animation after the pop
+                                gsap.from(this.timerTextElement, {
+                                    scale: 2,  // Start from the pop animation end state
+                                    rotation: -8,  // Start from the pop animation end state
+                                    duration: 0  // Immediate start
+                                });
+                                
+                                gsap.timeline({
+                                    repeat: -1,
+                                    defaults: {
+                                        
+                                    }
+                                })
+
+                                .to(this.timerTextElement, {
+                                    scale: 1.5,
+                                    rotation: -15,
+                                    duration: 0.5
+                                });
+                            }
+                        });
+                }, 100);
             }
         };
 
-        requestAnimationFrame(updateTimer);
+        this.timerInterval = requestAnimationFrame(updateTimer);
     }
 
     loadQuestion() {
         // Clear any existing timers and animations
         if (this.timerInterval) {
-            clearInterval(this.timerInterval);
+            cancelAnimationFrame(this.timerInterval);
             this.timerInterval = null;
+        }
+        if (this.completionTimeout) {
+            clearTimeout(this.completionTimeout);
+            this.completionTimeout = null;
         }
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
 
