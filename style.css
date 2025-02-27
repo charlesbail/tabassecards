@@ -30,12 +30,8 @@
 	position: fixed;
 	top: 0;
 	left: 0;
-	right: 0;
-	bottom: 0;
 	width: 100%;
 	height: 100%;
-	padding-top: env(safe-area-inset-top);
-	margin-top: calc(-1 * env(safe-area-inset-top));
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -79,8 +75,6 @@ body:not(.loading) .game-wrapper {
 html, body {
 	min-height: 100vh;
 	min-height: calc(var(--real-vh, 1vh) * 100);
-	min-height: -webkit-fill-available;
-	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -100,8 +94,6 @@ html, body {
 
 body {
 	color: var(--light-color);
-	background: transparent;
-	min-height: -webkit-fill-available;
 }
 
 @media (hover: hover) {
@@ -331,7 +323,6 @@ a
 
 .timer-text {
     position: absolute;
-    right: -7px;
     width: 32px;
     text-align: center;
     background: #FF00B5;
@@ -355,10 +346,7 @@ a
     will-change: transform;
 }
 
-.timer-text.finished {
-    background: #FFB803;
-    transform: translateX(50%) rotate(-8deg) scale(1.5);
-}
+
 
 .display-answer {
     background: rgba(255, 255, 255, 0.2);
