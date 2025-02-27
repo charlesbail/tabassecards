@@ -81,68 +81,61 @@ class Game {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
-
-        // Reset timer state and clear any previous GSAP animations
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
-        
-        // Reset timer text
-        this.timerTextElement.style.display = 'flex';
+
+        // Reset timer text with a fixed starting position
+        this.timerTextElement.style.display = 'block';
+        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)'; // Fixed starting position
+        this.timerTextElement.style.background = '#FF00B5';
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
-        
-        // Reset initial positions and styles
-        gsap.set(this.timerTextElement, {
-            y: 0,
-            scale: 1,
-            rotation: -8,
-            backgroundColor: "#FF00B5",
-            bottom: `${this.timerBasePosition}px`,
-            transform: "translateX(50%)",
-            display: "flex"
-        });
-        gsap.set(this.timerBar, {
-            height: 0
-        });
 
-        // Animate the progress bar
-        gsap.to(this.timerBar, {
-            height: 191,
-            duration: this.timerDuration / 1000,
-            ease: "none"
-        });
+        // Force reflow
+        void this.timerTextElement.offsetHeight;
 
         const startTime = Date.now();
         const updateTimer = () => {
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
+            const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
-            // Update timer text position based on current progress bar height
-            const progress = Math.min((elapsed / this.timerDuration), 1);
-            const barHeight = progress * 191;
+            // Simplified positioning using a single range
+            const START_POSITION = 24;  // Starting Y position
+            const TRAVEL_DISTANCE = -208;  // Total distance to travel
+            const currentPosition = START_POSITION + (TRAVEL_DISTANCE * (progress / 100));
             
-            // Update timer position while maintaining horizontal centering
-            this.timerTextElement.style.bottom = `${this.timerBasePosition + barHeight}px`;
+            // Update timer bar height
+            this.timerBar.style.height = `${progress * 1.91}px`;
+            
+            // Update text position with simplified calculation
+            this.timerTextElement.style.transform = `translate(-9px, ${currentPosition}px) rotate(-8deg)`;
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
+                requestAnimationFrame(updateTimer);
             } else {
+                // Final animation
                 this.timerTextElement.textContent = '🔥';
                 this.timerTextElement.classList.add('finished');
-                gsap.to(this.timerTextElement, {
-                    scale: 2,
-                    rotation: -8,
-                    duration: 2.2,
-					y: -16,
-                    ease: "elastic.out(1.15,0.2)",
-                    backgroundColor: "#FFB803",
-                    transform: "translateX(50%) rotate(-8deg)"
-                });
-                clearInterval(this.timerInterval);
+                
+                gsap.timeline()
+                    .to(this.timerTextElement, {
+                        scale: 0.8,
+                        rotation: -15,
+                        duration: 0.15,
+                        ease: "power2.in"
+                    })
+                    .to(this.timerTextElement, {
+                        scale: 1.5,
+                        rotation: -8,
+                        duration: 0.8,
+                        ease: "elastic.out(1, 0.3)",
+                        backgroundColor: "#FFB803"
+                    });
             }
         };
 
-        this.timerInterval = setInterval(updateTimer, 16);
-        updateTimer();
+        requestAnimationFrame(updateTimer);
     }
 
     loadQuestion() {
