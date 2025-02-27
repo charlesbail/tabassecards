@@ -13,6 +13,10 @@ class Game {
     }
 
     init() {
+        // Ensure loading class is present at start
+        document.documentElement.classList.add('loading');
+        document.body.classList.add('loading');
+
         this.allQuestions = [...questions];
         this.currentQuestionIndex = 0;
         this.timerBasePosition = 40;
@@ -46,6 +50,7 @@ class Game {
 
             // Remove loading class with a slight delay to ensure smooth transition
             setTimeout(() => {
+                document.documentElement.classList.remove('loading');
                 document.body.classList.remove('loading');
             }, 100);
         });
@@ -158,8 +163,8 @@ class Game {
             const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
             // Simplified positioning using a single range
-            const START_POSITION = 24;
-            const TRAVEL_DISTANCE = -208;
+            const START_POSITION = 0;
+            const TRAVEL_DISTANCE = -200;
             const currentPosition = START_POSITION + (TRAVEL_DISTANCE * (progress / 100));
             
             // Update timer bar height
