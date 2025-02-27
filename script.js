@@ -44,6 +44,22 @@ class Game {
         document.documentElement.style.setProperty('--real-vh', `${vh}px`);
     }
 
+    resetTimerText() {
+        // Reset timer text appearance
+        this.timerTextElement.classList.remove('finished');
+        this.timerTextElement.style.display = 'flex';
+        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
+        this.timerTextElement.style.scale = "1";
+        this.timerTextElement.style.backgroundColor = "#FF00B5";
+        this.timerTextElement.style.bottom = "36px";
+        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
+        this.timerBar.style.height = '0px';
+        
+        // Force a reflow to ensure styles are applied
+        void this.timerTextElement.offsetHeight;
+        void this.timerBar.offsetHeight;
+    }
+
     initializeUI() {
         // Card elements
         this.cardContainer = document.querySelector('.cardcont');
@@ -65,7 +81,8 @@ class Game {
         this.timerBar.className = 'timer-bar';
         timerContainer.appendChild(this.timerBar);
         
-        // Start the first timer
+        // Reset timer text and start
+        this.resetTimerText();
         this.startTimer();
     }
 
@@ -89,15 +106,8 @@ class Game {
         }
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
 
-        // Reset timer text with a fixed starting position
-        this.timerTextElement.style.display = 'block';
-        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
-        this.timerTextElement.style.background = '#FF00B5';
-        this.timerTextElement.classList.remove('finished');
-        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
-
-        // Force reflow
-        void this.timerTextElement.offsetHeight;
+        // Reset timer text
+        this.resetTimerText();
 
         const startTime = Date.now();
         const updateTimer = () => {
@@ -186,20 +196,8 @@ class Game {
         }
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
 
-        // Immediately reset timer text appearance
-        this.timerTextElement.classList.remove('finished');
-        this.timerTextElement.style.display = 'flex';
-        this.timerTextElement.style.transform = "translateX(50%) rotate(-8deg)";
-        this.timerTextElement.style.scale = "1";
-        this.timerTextElement.style.backgroundColor = "#FF00B5";
-        this.timerTextElement.style.bottom = "36px";
-        this.timerBar.style.height = '0px';
-        
-        // Force browser reflow
-        void this.timerTextElement.offsetHeight;
-        void this.timerBar.offsetHeight;
-
-        // Start timer immediately
+        // Reset timer text and start new timer
+        this.resetTimerText();
         this.startTimer();
         
         const question = this.allQuestions[this.currentQuestionIndex];
