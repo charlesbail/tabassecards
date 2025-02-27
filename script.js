@@ -81,31 +81,53 @@ class Game {
             this.timerInterval = null;
         }
 
-        // Reset timer state
-        this.timerBar.style.height = '0px';
+        // Reset timer state and clear any previous GSAP animations
+        gsap.killTweensOf([this.timerTextElement, this.timerBar]);
+        gsap.set(this.timerTextElement, {
+            clearProps: "all",
+            scale: 1,
+            rotation: 8,
+            backgroundColor: "#FF00B5"
+        });
+        gsap.set(this.timerBar, {
+            height: 0,
+            clearProps: "all"
+        });
+
         this.timerTextElement.style.display = 'flex';
         this.timerTextElement.style.bottom = '28px';
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
 
+        // Animate the progress bar
+        gsap.to(this.timerBar, {
+            height: 191,
+            duration: this.timerDuration / 1000,
+            ease: "linear"
+        });
+
         const startTime = Date.now();
         const updateTimer = () => {
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
+            
+            // Update timer text position based on current progress bar height
             const progress = Math.min((elapsed / this.timerDuration), 1);
-            
-            // Update bar height (191px is the maximum height)
             const barHeight = progress * 191;
-            this.timerBar.style.height = `${barHeight}px`;
-            
-            // Update timer text position
-            this.timerTextElement.style.bottom = `${12 + barHeight}px`;
+            this.timerTextElement.style.bottom = `${8 + barHeight}px`;
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
             } else {
                 this.timerTextElement.textContent = '🔥';
                 this.timerTextElement.classList.add('finished');
+                gsap.to(this.timerTextElement, {
+                    scale: 2,
+                    rotation: -8,
+                    duration: 1.4,
+                    ease: "elastic.out(1,0.3)",
+                    backgroundColor: "#FFB803"
+                });
                 clearInterval(this.timerInterval);
             }
         };
@@ -122,9 +144,10 @@ class Game {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
-        this.timerBar.style.height = '0px';
-        this.timerTextElement.style.bottom = '28px';
-        this.timerTextElement.classList.remove('finished');
+
+        // Kill any existing GSAP animations before starting new ones
+        gsap.killTweensOf(this.timerTextElement);
+        
         this.startTimer();
         
         const tl = gsap.timeline();
