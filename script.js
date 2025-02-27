@@ -90,7 +90,7 @@ class Game {
         // Reset timer text appearance
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.style.display = 'flex';
-        this.timerTextElement.style.transform = 'translate(-9px, -50px) rotate(-8deg)';
+        this.timerTextElement.style.transform = 'translate(0, -50px) rotate(-8deg)';
         this.timerTextElement.style.scale = "1";
         this.timerTextElement.style.backgroundColor = "#FF00B5";
         this.timerTextElement.style.bottom = "36px";
@@ -158,15 +158,15 @@ class Game {
             const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
             
             // Simplified positioning using a single range
-            const START_POSITION = 24;
-            const TRAVEL_DISTANCE = -208;
+            const START_POSITION = 0;
+            const TRAVEL_DISTANCE = -200;
             const currentPosition = START_POSITION + (TRAVEL_DISTANCE * (progress / 100));
             
             // Update timer bar height
             this.timerBar.style.height = `${progress * 1.91}px`;
             
             // Update text position with simplified calculation
-            this.timerTextElement.style.transform = `translate(-9px, ${currentPosition}px) rotate(-8deg)`;
+            this.timerTextElement.style.transform = `translate(0, ${currentPosition}px) rotate(-8deg)`;
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
@@ -174,7 +174,7 @@ class Game {
             } else {
                 // Wait for the text to reach final position before starting animation
                 const finalY = START_POSITION + TRAVEL_DISTANCE;
-                this.timerTextElement.style.transform = `translate(-9px, ${finalY}px) rotate(-8deg)`;
+                this.timerTextElement.style.transform = `translate(0, ${finalY}px) rotate(-8deg)`;
                 
                 // Store the timeout reference so we can clear it if needed
                 this.completionTimeout = setTimeout(() => {
