@@ -1,49 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta property="og:image" content="assets/tabasse-og.jpg" />
-	<meta property="og:image:secure_url" content="assets/tabasse-og.jpg" />
-	<meta property="og:image:type" content="image/jpeg" />
-	<meta property="og:title" content="TABASSE — Le jeu qui pique" />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content="//www.tabasse.fun" />
-	<meta property="og:description" content="Un jeu de cartes épicé pour les amateurs de sensations fortes !" />
-	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-	<link rel="stylesheet" href="style.css" />
-	<link rel="shortcut icon" type="image/png" href="assets/tabasse.ico"/>
-	<title>TABASSE — Le jeu qui pique</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Primary Meta Tags -->
+    <meta name="description" content="Le jeu qui tabasse">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tabasse.fr/" />
+    <meta property="og:title" content="TABASSE — Le jeu qui tabasse" />
+    <meta property="og:description" content="Le jeu qui tabasse" />
+    <meta property="og:image" content="https://tabasse.fr/assets/oggraph.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/tabasse.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" href="assets/tabasse-192.png" sizes="192x192" />
+    <link rel="icon" type="image/png" href="assets/tabasse-512.png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="assets/tabasse-180.png" />
+    
+    <link rel="stylesheet" href="style.css" />
+    <title>TABASSE — Le jeu qui tabasse</title>
 </head>
-<body>
-	<div class="main-wrapper set-hide">
-		<div id="title">
-			TABASSE
-			<div id="subtitle">Le jeu qui pique 🌶️</div>
-		</div>
-		
-		<div id="intro">Prêt à relever le défi ? Réponds aux questions ou goûte nos sauces !</div>
-		
-		<div class="cards-stack">
-			<div class="stacked-card"></div>
-			<div class="stacked-card"></div>
-			<div class="stacked-card"></div>
-		</div>
+<body class="loading">
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+    <div class="game-wrapper">
+        <div class="logo-container">
+        </div>
+        
+        <div class="cardcont">
+            <div class="front card-style">
+                <div class="timer-container">
+                    <object id="thermo-svg" type="image/svg+xml" data="assets/thermo.svg"></object>
+                    <div class="timer-text" id="timer-text">00s</div>
+                </div>
+                <div class="inner">
+                    <div class="category" id="question-category">Culture Générale</div>
+                    <div class="question" id="question-text">Quel est l'ingrédient qui rend les piments piquants ?</div>
+                    <div class="author" id="question-author">Par Eva S.</div>
+                </div>
+            </div>
+            <div class="back card-style">
+                <div class="inner">
+                    <div class="category" id="back-category">Culture Générale</div>
+                    <div class="tabasse-logo">TABASSE</div>
+                </div>
+            </div>
+        </div>
+        
+        <a class="shuffle-button" id="next-question">
+            <img src="assets/btn-shuffle.svg" alt="Question suivante">
+        </a>
 
-		<a id="start-button" href="game.html" class="start"><div>Jouer</div></a>
-		
-		<div id="caption">
-			Un jeu créé par l'équipe TABASSE
-		</div>
-	</div>
+        <div class="credit-line">
+            <a href="https://www.instagram.com/tabasse.fr/" target="_blank">@tabasse.fr</a><span>·</span><a href="https://www.charlesbail.fr" target="_blank">Code par CB</a>
+        </div>
+    </div>
+<div id="flames"></div>
 
-	<!-- GSAP 3 Core + Plugins -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
-	
-	<!-- jQuery -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	
-	<script type="module" src="anim_home.js"></script>
+
+    <!-- GSAP 3 Core + Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    <script type="module" src="script.js"></script>
 </body>
-</html>
+</html> 
