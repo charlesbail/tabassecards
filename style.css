@@ -1,12 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
-	--primary-color: #FF6B00;
-	--secondary-color: #FF4D00;
 	--dark-color: #1A1A1A;
 	--light-color: #FFFFFF;
-	--error-color: #FF3B30;
-	--success-color: #34C759;
 	--vh: 100%;
 	--real-vh: 1vh;
 	--timer-duration: 40s;
@@ -88,53 +84,6 @@ a
     top: 0;
     left: 0;
     z-index: -999;
-}
-
-#message1,
-#message2 {
-	font-family: Verdana, sans-serif;
-	font-size: 3em;
-	width: 56px;
-	text-align: center;
-	display: block;
-	font-size: 48px;
-}
-
-#message2{
-
-}
-
-#intro{
-	color: #FFFFFF;
-	font-size:16px;
-	line-height: 22px;
-	text-align: center;
-	margin-top: 24px;
-}
-
-#caption{
-	color: #FFFFFF;
-	font-size:16px;
-	text-align: center;
-	margin-top: 24px;
-	font-weight: 300;
-	font-size: 14px;
-	margin-top: 64px;
-	text-shadow: 0px 1px 6px rgba(157, 60, 114, 0.3);
-}
-
-#caption a{
-	color: white;
-	font-weight: 500;
-	padding: 4px;
-	border-radius: 2px;
-	transition: .2s cubic-bezier(0.4, 0.2, 0.2, 1);
-	letter-spacing: 1%;
-}
-
-#caption a:hover{
-	background-color: rgba(21, 41, 52, 0.8);
-	transition: .2s cubic-bezier(0.4, 0.2, 0.2, 1);
 }
 
 .start{
@@ -244,11 +193,7 @@ a
     z-index: 2;
 }
 
-.front .category,
-.front .question,
-.front .author {
 
-}
 
 .score-container {
     position: absolute;
@@ -455,41 +400,6 @@ a
     text-align: center;
 }
 
-.restart-button,
-.next-button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background: var(--primary-color);
-    color: var(--light-color);
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 24px;
-    transition: transform 0.2s ease;
-}
-
-.restart-button:hover,
-.next-button:hover {
-    transform: scale(1.05);
-}
-
-/* Take sauce modal specific styles */
-#take-sauce-modal .modal-content {
-    text-align: center;
-}
-
-#take-sauce-modal h2 {
-    color: var(--primary-color);
-}
-
-#take-sauce-modal p {
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 16px 0;
-}
 
 .timer {
     position: absolute;
@@ -514,7 +424,6 @@ a
     right: -4px;
     transform: translate(0, -30px) rotate(-8deg);
 	background: #FF00B5;
-
 	box-shadow: 0px 2px 3px 0px rgba(64, 0, 115, 0.10);
     color: var(--light-color);
     padding: 4px 8px;
@@ -523,7 +432,6 @@ a
     font-size: 14px;
     z-index: 10;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-
     white-space: nowrap;
 }
 
@@ -616,8 +524,8 @@ a
 .back .inner::before {
     content: '';
     position: absolute;
-    width: 160px;
-    height: 160px;
+    width: 2000px;
+    height: 2000px;
     background-image: url('assets/mascotte.png');
     background-size: contain;
     background-position: center;
@@ -662,21 +570,17 @@ a
 }
 
 .category {
-   
     text-transform: uppercase;
- 
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-
-color: #FF2DAD;
-font-family: "Space Grotesk";
-font-size: 17px;
-font-style: normal;
-font-weight: 700;
-line-height: normal;
-
+    color: #FF2DAD;
+    font-family: "Space Grotesk";
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }
 
 .question {
@@ -754,7 +658,7 @@ line-height: normal;
     -webkit-user-select: none;
     -ms-user-select: none;
     -webkit-touch-callout: none;
-    draggable: false;
+
 }
 
 .main-button {
