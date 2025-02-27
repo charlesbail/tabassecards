@@ -524,8 +524,8 @@ a
 .back .inner::before {
     content: '';
     position: absolute;
-    width: 2000px;
-    height: 2000px;
+    width: 200px;
+    height: 166px;
     background-image: url('assets/mascotte.png');
     background-size: contain;
     background-position: center;
