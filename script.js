@@ -28,15 +28,57 @@ class Game {
         window.addEventListener('resize', () => this.handleViewportHeight());
         window.addEventListener('orientationchange', () => this.handleViewportHeight());
 
-        // Initialize UI elements
-        this.initializeUI();
-        this.setupEventListeners();
+        // Start preloading
+        Promise.all([
+            this.loadFonts(),
+            this.preloadImages(),
+            new Promise(resolve => setTimeout(resolve, 800)) // Minimum display time for loader
+        ]).then(() => {
+            // Initialize UI elements
+            this.initializeUI();
+            this.setupEventListeners();
 
-        // Set initial transforms
-        gsap.set(this.cardBack, { rotationY: 180 });
+            // Set initial transforms
+            gsap.set(this.cardBack, { rotationY: 180 });
 
-        // Load the first question after initialization
-        this.loadQuestion();
+            // Load the first question
+            this.loadQuestion();
+
+            // Remove loading class with a slight delay to ensure smooth transition
+            setTimeout(() => {
+                document.body.classList.remove('loading');
+            }, 100);
+        });
+    }
+
+    async loadFonts() {
+        const font = new FontFace('Space Grotesk', 'url(https://fonts.gstatic.com/s/spacegrotesk/v13/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMBBSSJLm2E.woff2)');
+        await font.load();
+        document.fonts.add(font);
+        return document.fonts.ready;
+    }
+
+    async preloadImages() {
+        const imagePaths = [
+            'assets/bg-pattern.png',
+            'assets/back-background.png',
+            'assets/mascotte.png',
+            'assets/header-logo.png',
+            'assets/flames.svg',
+            'assets/thermo.svg',
+            'assets/btn-shuffle.svg'
+        ];
+
+        const loadImage = src => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        };
+
+        return Promise.all(imagePaths.map(loadImage));
     }
 
     handleViewportHeight() {
