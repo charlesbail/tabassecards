@@ -171,14 +171,5 @@ const questions = [
     }
 ];
 
-// Function to shuffle questions array
-function shuffleQuestions() {
-    for (let i = questions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
-    }
-    return questions;
-}
-
-// Export for use in other files
-export { questions, shuffleQuestions }; 
+// Export questions data
+export { questions };
