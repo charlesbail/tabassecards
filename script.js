@@ -83,27 +83,33 @@ class Game {
 
         // Reset timer state and clear any previous GSAP animations
         gsap.killTweensOf([this.timerTextElement, this.timerBar]);
-        gsap.set(this.timerTextElement, {
-            clearProps: "all",
-            scale: 1,
-            rotation: 8,
-            backgroundColor: "#FF00B5"
-        });
-        gsap.set(this.timerBar, {
-            height: 0,
-            clearProps: "all"
-        });
-
+        
+        // Reset timer text
         this.timerTextElement.style.display = 'flex';
-        this.timerTextElement.style.bottom = '28px';
         this.timerTextElement.classList.remove('finished');
         this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
+        
+        // Reset initial positions
+        gsap.set(this.timerBar, {
+            height: 0,
+            clearProps: "background"
+        });
+        
+        const TIMER_BOTTOM = 36; // Base position in pixels
+
+        gsap.set(this.timerTextElement, {
+            bottom: `${TIMER_BOTTOM}px`,
+            scale: 1,
+            rotation: -8,
+            backgroundColor: "#FF00B5",
+            transform: "translateX(50%) rotate(-8deg)"
+        });
 
         // Animate the progress bar
         gsap.to(this.timerBar, {
             height: 191,
             duration: this.timerDuration / 1000,
-            ease: "linear"
+            ease: "none"
         });
 
         const startTime = Date.now();
@@ -114,7 +120,12 @@ class Game {
             // Update timer text position based on current progress bar height
             const progress = Math.min((elapsed / this.timerDuration), 1);
             const barHeight = progress * 191;
-            this.timerTextElement.style.bottom = `${8 + barHeight}px`;
+            
+            // Update timer position while maintaining horizontal centering
+            gsap.set(this.timerTextElement, {
+                bottom: TIMER_BOTTOM + barHeight,
+                transform: "translateX(50%) rotate(-8deg)"
+            });
             
             if (remaining > 0) {
                 this.timerTextElement.textContent = `${remaining}s`;
@@ -122,11 +133,12 @@ class Game {
                 this.timerTextElement.textContent = '🔥';
                 this.timerTextElement.classList.add('finished');
                 gsap.to(this.timerTextElement, {
-                    scale: 2,
+                    scale: 1.5,
                     rotation: -8,
-                    duration: 1.4,
+                    duration: 0.6,
                     ease: "elastic.out(1,0.3)",
-                    backgroundColor: "#FFB803"
+                    backgroundColor: "#FFB803",
+                    transform: "translateX(50%) rotate(-8deg) scale(1.5)"
                 });
                 clearInterval(this.timerInterval);
             }
