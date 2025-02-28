@@ -40,8 +40,16 @@
         <div class="cardcont">
             <div class="front card-style">
                 <div class="timer-container">
-                    <object id="thermo-svg" type="image/svg+xml" data="assets/thermo.svg"></object>
-                    <div class="timer-text" id="timer-text">00s</div>
+                    <div id="thermo-svg" class="thermo-svg">
+                        <svg width="34" height="224" viewBox="0 0 34 224" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="thermo">
+                                <path id="outside" d="M8 9V192.575C3.19569 195.579 0 200.916 0 207C0 216.389 7.61116 224 17 224C26.3888 224 34 216.389 34 207C34 200.916 30.8043 195.579 26 192.575V9C26 4.02944 21.9706 0 17 0C12.0294 0 8 4.02944 8 9Z" fill="white"/>
+                                <circle id="circle" cx="17" cy="207" r="12" fill="#FF00B5"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="timer-bar" style="height: 0px;"></div>
+                    <div class="timer-text" id="timer-text" style="transform: translate(0, -50px) rotate(-8deg); bottom: 36px;">42s</div>
                 </div>
                 <div class="inner">
                     <div class="category" id="question-category">Culture Générale</div>
