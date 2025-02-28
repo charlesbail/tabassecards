@@ -1,54 +1,78 @@
 import { questions } from './questions.js';
 
+// Constants
+const TIMER_DURATION_SECONDS = 42;
+const TIMER_DURATION_MS = TIMER_DURATION_SECONDS * 1000;
 
 // Game class
 class Game {
     constructor() {
+        // Set timer duration as CSS variable immediately
+        document.documentElement.style.setProperty('--timer-duration', `${TIMER_DURATION_SECONDS}s`);
+        
         // Wait for DOM content to be loaded before initializing
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
+            document.addEventListener('DOMContentLoaded', () => this.waitForDependencies());
         } else {
-            this.init();
+            this.waitForDependencies();
         }
     }
 
-    init() {
+    waitForDependencies() {
+        // Check if GSAP is loaded
+        if (typeof gsap === 'undefined') {
+            setTimeout(() => this.waitForDependencies(), 100);
+            return;
+        }
+        this.init();
+    }
+
+    async init() {
+        // Ensure loading class is present at start
+        document.documentElement.classList.add('loading');
+        document.body.classList.add('loading');
+
         this.allQuestions = [...questions];
         this.currentQuestionIndex = 0;
         this.timerBasePosition = 40;
-        this.timerDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer-duration')) * 1000;
+        this.timerDuration = TIMER_DURATION_MS;
         this.timerInterval = null;
         this.completionTimeout = null;
         this.isFlipped = false;
         this.thermoSvg = null;
-        this.thermoBar = null;
+        this.timerBar = null;
 
         // Handle viewport height
         this.handleViewportHeight();
         window.addEventListener('resize', () => this.handleViewportHeight());
         window.addEventListener('orientationchange', () => this.handleViewportHeight());
 
-        // Start preloading
-        Promise.all([
-            this.loadFonts(),
-            this.preloadImages(),
-            new Promise(resolve => setTimeout(resolve, 800)) // Minimum display time for loader
-        ]).then(() => {
-            // Initialize UI elements
-            this.initializeUI();
+        try {
+            // Start preloading
+            await Promise.all([
+                this.loadFonts(),
+                this.preloadImages(),
+                new Promise(resolve => setTimeout(resolve, 800)) // Minimum display time for loader
+            ]);
+
+            // Initialize UI elements after everything is loaded
+            await this.initializeUI();
             this.setupEventListeners();
 
             // Set initial transforms
             gsap.set(this.cardBack, { rotationY: 180 });
 
-            // Load the first question
+            // Load the first question with a delay to ensure proper initialization
+            await new Promise(resolve => setTimeout(resolve, 100));
             this.loadQuestion();
+            
+            // Remove loading class after everything is ready
+            document.documentElement.classList.remove('loading');
+            document.body.classList.remove('loading');
 
-            // Remove loading class with a slight delay to ensure smooth transition
-            setTimeout(() => {
-                document.body.classList.remove('loading');
-            }, 100);
-        });
+        } catch (error) {
+            console.error('Initialization error:', error);
+        }
     }
 
     async loadFonts() {
@@ -102,30 +126,39 @@ class Game {
         void this.timerBar.offsetHeight;
     }
 
-    initializeUI() {
-        // Card elements
-        this.cardContainer = document.querySelector('.cardcont');
-        this.cardFront = document.querySelector('.front');
-        this.cardBack = document.querySelector('.back');
-        
-        // Question elements
-        this.categoryElement = document.getElementById('question-category');
-        this.questionElement = document.getElementById('question-text');
-        this.authorElement = document.getElementById('question-author');
-        this.backCategoryElement = document.getElementById('back-category');
-        
-        // Timer elements
-        this.timerTextElement = document.getElementById('timer-text');
-        
-        // Create and add the timer bar
-        const timerContainer = document.querySelector('.timer-container');
-        this.timerBar = document.createElement('div');
-        this.timerBar.className = 'timer-bar';
-        timerContainer.appendChild(this.timerBar);
-        
-        // Reset timer text and start
-        this.resetTimerText();
-        this.startTimer();
+    async initializeUI() {
+        return new Promise(resolve => {
+            // Card elements
+            this.cardContainer = document.querySelector('.cardcont');
+            this.cardFront = document.querySelector('.front');
+            this.cardBack = document.querySelector('.back');
+            
+            // Question elements
+            this.categoryElement = document.getElementById('question-category');
+            this.questionElement = document.getElementById('question-text');
+            this.authorElement = document.getElementById('question-author');
+            this.backCategoryElement = document.getElementById('back-category');
+            
+            // Timer elements
+            this.timerTextElement = document.getElementById('timer-text');
+            this.timerBar = document.querySelector('.timer-bar');
+            
+            // Ensure timer is in initial state
+            this.timerTextElement.style.display = 'flex';
+            this.timerTextElement.style.transform = 'translate(0, -50px) rotate(-8deg)';
+            this.timerTextElement.style.scale = "1";
+            this.timerTextElement.style.backgroundColor = "#FF00B5";
+            this.timerTextElement.style.bottom = "36px";
+            this.timerTextElement.classList.remove('finished');
+            this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
+            this.timerBar.style.height = '0px';
+            
+            // Force a reflow
+            void this.timerTextElement.offsetHeight;
+            void this.timerBar.offsetHeight;
+            
+            resolve();
+        });
     }
 
     setupEventListeners() {
@@ -137,7 +170,7 @@ class Game {
     }
 
     startTimer() {
-        // Clear any existing timers and animations
+        // Ensure any existing animations are cleared
         if (this.timerInterval) {
             cancelAnimationFrame(this.timerInterval);
             this.timerInterval = null;
@@ -146,101 +179,87 @@ class Game {
             clearTimeout(this.completionTimeout);
             this.completionTimeout = null;
         }
-        gsap.killTweensOf([this.timerTextElement, this.timerBar]);
+        
+        // Kill any existing GSAP animations
+        if (typeof gsap !== 'undefined') {
+            gsap.killTweensOf([this.timerTextElement, this.timerBar]);
+        }
 
-        // Reset timer text
-        this.resetTimerText();
+        // Reset timer elements to initial state
+        this.timerTextElement.classList.remove('finished');
+        this.timerTextElement.style.display = 'flex';
+        this.timerTextElement.style.transform = 'translate(0, -50px) rotate(-8deg)';
+        this.timerTextElement.style.scale = "1";
+        this.timerTextElement.style.backgroundColor = "#FF00B5";
+        this.timerTextElement.style.bottom = "36px";
+        this.timerTextElement.textContent = `${this.timerDuration/1000}s`;
+        this.timerBar.style.height = '0px';
 
-        const startTime = Date.now();
-        const updateTimer = () => {
-            const elapsed = Date.now() - startTime;
-            const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
-            const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
-            
-            // Simplified positioning using a single range
-            const START_POSITION = 0;
-            const TRAVEL_DISTANCE = -200;
-            const currentPosition = START_POSITION + (TRAVEL_DISTANCE * (progress / 100));
-            
-            // Update timer bar height
-            this.timerBar.style.height = `${progress * 1.91}px`;
-            
-            // Update text position with simplified calculation
-            this.timerTextElement.style.transform = `translate(0, ${currentPosition}px) rotate(-8deg)`;
-            
-            if (remaining > 0) {
-                this.timerTextElement.textContent = `${remaining}s`;
-                this.timerInterval = requestAnimationFrame(updateTimer);
-            } else {
-                // Wait for the text to reach final position before starting animation
-                const finalY = START_POSITION + TRAVEL_DISTANCE;
-                this.timerTextElement.style.transform = `translate(0, ${finalY}px) rotate(-8deg)`;
+        // Force a reflow
+        void this.timerTextElement.offsetHeight;
+        void this.timerBar.offsetHeight;
+
+        // Start the timer after a short delay
+        setTimeout(() => {
+            const startTime = Date.now();
+            const updateTimer = () => {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(Math.ceil((this.timerDuration - elapsed) / 1000), 0);
+                const progress = Math.min((elapsed / this.timerDuration) * 100, 100);
                 
-                // Store the timeout reference so we can clear it if needed
-                this.completionTimeout = setTimeout(() => {
-                    if (!this.completionTimeout) return; // Exit if cleared
+                // Update timer bar height
+                this.timerBar.style.height = `${progress * 1.91}px`;
+                
+                // Update text position
+                const currentPosition = -200 * (progress / 100);
+                this.timerTextElement.style.transform = `translate(0, ${currentPosition}px) rotate(-8deg)`;
+                
+                if (remaining > 0) {
+                    this.timerTextElement.textContent = `${remaining}s`;
+                    this.timerInterval = requestAnimationFrame(updateTimer);
+                } else {
                     this.timerTextElement.textContent = '🔥';
                     this.timerTextElement.classList.add('finished');
                     
-                    // Initial pop animation
-                    gsap.timeline()
-                        .to(this.timerTextElement, {
-                            scale: 0.8,
-                            rotation: -15,
-                            y: finalY - 24,
-                            duration: 0.15,
-                            ease: "power2.in"
-                        })
-                        .to(this.timerTextElement, {
-                            scale: 2,
-                            rotation: -8,
-                            duration: 0.8,
-                            ease: "elastic.out(1.15, 0.2)",
-                            backgroundColor: "#FFB803",
-                            onComplete: () => {
-                                // Start the looping animation
-                                gsap.from(this.timerTextElement, {
-                                    scale: 2,
-                                    rotation: -8,
-                                    duration: 0
-                                });
-                                
-                                gsap.timeline({
-                                    repeat: -1,
-                                    defaults: {
-                                        
-                                    }
-                                })
+                    if (typeof gsap !== 'undefined') {
+                        gsap.timeline()
+                            .to(this.timerTextElement, {
+                                scale: 0.8,
+                                rotation: -15,
+                                y: -224,
+                                duration: 0.15,
+                                ease: "power2.in"
+                            })
+                            .to(this.timerTextElement, {
+                                scale: 2,
+                                rotation: -8,
+                                duration: 0.8,
+                                ease: "elastic.out(1.15, 0.2)",
+                                backgroundColor: "#FFB803",
+                                onComplete: () => {
+                                    gsap.to(this.timerTextElement, {
+                                        scale: 1.5,
+                                        rotation: -15,
+                                        duration: 0.5,
+                                        repeat: -1,
+                                        yoyo: true
+                                    });
+                                }
+                            });
+                    }
+                }
+            };
 
-                                .to(this.timerTextElement, {
-                                    scale: 1.5,
-                                    rotation: -15,
-                                    duration: 0.5
-                                });
-                            }
-                        });
-                }, 100);
-            }
-        };
-
-        this.timerInterval = requestAnimationFrame(updateTimer);
+            this.timerInterval = requestAnimationFrame(updateTimer);
+        }, 50);
     }
 
     loadQuestion() {
-        // Clear any existing timers and animations
-        if (this.timerInterval) {
-            cancelAnimationFrame(this.timerInterval);
-            this.timerInterval = null;
-        }
-        if (this.completionTimeout) {
-            clearTimeout(this.completionTimeout);
-            this.completionTimeout = null;
-        }
-        gsap.killTweensOf([this.timerTextElement, this.timerBar]);
-
-        // Reset timer text and start new timer
-        this.resetTimerText();
-        this.startTimer();
+        // Reset and start timer only after a short delay to ensure DOM updates
+        setTimeout(() => {
+            this.resetTimerText();
+            this.startTimer();
+        }, 50);
         
         const question = this.allQuestions[this.currentQuestionIndex];
         
